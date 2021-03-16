@@ -16,8 +16,13 @@ defmodule NeosSocketWeb.Router do
 
   scope "/", NeosSocketWeb do
     pipe_through :browser
+    live "/rooms", RoomLive.Index, :index
+    live "/rooms/new", RoomLive.Index, :new
+    live "/rooms/:id/edit", RoomLive.Index, :edit
 
-    live "/", PageLive, :index
+    live "/rooms/:id", RoomLive.Show, :show
+    live "/rooms/:id/show/edit", RoomLive.Show, :edit
+    live "/", RoomLive.Index, :index
   end
 
   # Other scopes may use custom stacks.
