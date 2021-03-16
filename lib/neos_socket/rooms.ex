@@ -37,6 +37,10 @@ defmodule NeosSocket.Rooms do
   """
   def get_room!(id), do: Repo.get!(Room, id)
 
+  def get_room(id) do
+    Room |> where([r], r.id == ^id) |> Repo.one
+  end
+  
   @doc """
   Creates a room.
 
