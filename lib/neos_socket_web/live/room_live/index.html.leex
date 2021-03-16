@@ -1,4 +1,4 @@
-<h1>Listing Rooms</h1>
+<h1 class="title">Listing Rooms</h1>
 
 <%= if @live_action in [:new, :edit] do %>
   <%= live_modal @socket, NeosSocketWeb.RoomLive.FormComponent,
@@ -9,7 +9,7 @@
     return_to: Routes.room_index_path(@socket, :index) %>
 <% end %>
 
-<table>
+<table class="table is-striped  is-fullwidth">
   <thead>
     <tr>
       <th>Name</th>
@@ -34,4 +34,4 @@
   </tbody>
 </table>
 
-<span><%= live_patch "New Room", to: Routes.room_index_path(@socket, :new) %></span>
+<span class="button"><%= live_patch "New Room", to: Routes.room_index_path(@socket, :new) %></span>
