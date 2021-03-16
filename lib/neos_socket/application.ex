@@ -14,7 +14,8 @@ defmodule NeosSocket.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: NeosSocket.PubSub},
       # Start the Endpoint (http/https)
-      NeosSocketWeb.Endpoint
+      NeosSocketWeb.Endpoint,
+      NeosSocketWeb.Presence
       # Start a worker by calling: NeosSocket.Worker.start_link(arg)
       # {NeosSocket.Worker, arg}
     ]
