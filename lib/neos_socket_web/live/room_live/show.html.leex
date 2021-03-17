@@ -11,6 +11,34 @@
 
 </ul>
 
+<div class="box">
+  <%=
+    f = form_for @changeset, "#",
+    id: "board-form",
+    phx_submit: "send"
+  %>
+    <div class="media">
+      <%= label f, :to, class: "label mt-2 media-left"%>
+      <div class="media-content">
+        <div class="select">
+          <%=
+            select f,
+              :object_id,
+              [ [key: "all", value: 0] |Enum.map(@users, fn u -> [key: u.name, value: u.id] end)]
+          %>
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <%= label f, :message, class: "label" %>
+      <%= textarea f, :body, class: "textarea mt-1" %>
+    </div>
+
+    <%= error_tag f, :body %>
+    <%= hidden_input f, :room_id %>
+    <%= submit "save", class: "button mt-1 is-primary", phx_disable_with: "saving..."%>
+</div>
+
 <div class="columns mt-1">
   <%= for object <- @users do %>
     <div class="column is-one-fifth">
