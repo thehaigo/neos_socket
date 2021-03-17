@@ -7,7 +7,8 @@ defmodule NeosSocket.Rooms do
   alias NeosSocket.Repo
 
   alias NeosSocket.Rooms.Room
-
+  alias NeosSocket.Rooms.Message
+  
   @doc """
   Returns the list of rooms.
 
@@ -40,7 +41,7 @@ defmodule NeosSocket.Rooms do
   def get_room(id) do
     Room |> where([r], r.id == ^id) |> Repo.one
   end
-  
+
   @doc """
   Creates a room.
 
@@ -104,5 +105,15 @@ defmodule NeosSocket.Rooms do
   """
   def change_room(%Room{} = room, attrs \\ %{}) do
     Room.changeset(room, attrs)
+  end
+
+  def change_message(%Message{} = message, attrs \\ %{}) do
+    Message.changeset(message, attrs)
+  end
+
+  def create_message(attrs \\ %{}) do
+    %Message{}
+    |> Message.changeset(attrs)
+#    |> Repo.insert()
   end
 end
