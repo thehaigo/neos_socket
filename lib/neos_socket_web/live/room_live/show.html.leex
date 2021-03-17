@@ -31,7 +31,7 @@
     </div>
     <div class="field">
       <%= label f, :message, class: "label" %>
-      <%= textarea f, :body, class: "textarea mt-1" %>
+      <%= textarea f, :body, class: "input mt-1" %>
     </div>
 
     <%= error_tag f, :body %>
@@ -40,12 +40,31 @@
 </div>
 
 <div class="columns mt-1">
+  <div class="column is-one-fifth">
+    <div class="card">
+      <div class="card-content">
+        <h5 class="title is-4">Broadcast</h5>
+        <ul>
+          <%= for message <- @messages do %>
+            <li>[<%= message.body %>] from:<%= message.object_id %> </li>
+          <% end %>
+        </ul>
+
+      </div>
+    </div>
+
+  </div>
   <%= for object <- @users do %>
     <div class="column is-one-fifth">
       <div id="object-<%= object.id %>" class="card">
         <div class="card-content">
           <h5 class="title is-4">id: <%= object.id %></h5>
           <h5 class="title is-5">name: <%= object.name %></h5>
+          <ul>
+            <%= for message <- object.messages do %>
+              <li>[<%= message.body %>] from:<%= message.object_id %> </li>
+            <% end %>
+          </ul>
         </div>
       </div>
     </div>

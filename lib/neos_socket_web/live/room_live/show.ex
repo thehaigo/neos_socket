@@ -11,11 +11,12 @@ defmodule NeosSocketWeb.RoomLive.Show do
     room = Rooms.get_room!(id)
     changeset = Rooms.change_message(%Message{object_id: obj_id, room_id: id})
     NeosSocketWeb.Endpoint.subscribe("room:#{id}")
+    NeosSocketWeb.Endpoint.subscribe("user:#{obj_id}")
     Presence.track_presence(
       self(),
       "room:#{id}",
       obj_id,
-      %{ name: "liveview", id: obj_id}
+      %{ name: "liveview", id: obj_id, messages: []}
     )
 
     {
@@ -26,6 +27,7 @@ defmodule NeosSocketWeb.RoomLive.Show do
       |> assign(:object_id, obj_id)
       |> assign(:changeset, changeset)
       |> assign(:users, Presence.list_presence("room:#{id}"))
+      |> assign(:messages, [])
     }
   end
 
@@ -39,10 +41,29 @@ defmodule NeosSocketWeb.RoomLive.Show do
               "#{type}:#{message.object_id}"
             end
 
-    NeosWeb.Endpoint.broadcast!(
+    NeosSocketWeb.Endpoint.broadcast!(
       topic,
       "broadcast_#{type}",
       message
+    )
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_info(%{event: "broadcast_room", payload: state}, %{ assigns: %{messages: messages}} = socket) do
+    message = Rooms.create_message(state).changes
+    {:noreply, socket |> assign(:messages, [message | messages] |> List.flatten)}
+  end
+
+  @impl true
+  def handle_info(%{event: "broadcast_user", payload: state}, socket) do
+    message = Rooms.create_message(state).changes
+    presence = Presence.get_presence("room:#{message.room_id}", message.object_id)
+    Presence.update_presence(
+      self(),
+      "room:#{message.room_id}",
+      message.object_id,
+      %{messages: [message | presence.messages] |> List.flatten }
     )
     {:noreply, socket}
   end

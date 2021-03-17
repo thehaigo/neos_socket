@@ -11,11 +11,12 @@ defmodule NeosSocketWeb.RoomChannel do
         {:error, "room not found"}
       _room ->
         object_id = payload["object_id"]
+        NeosSocketWeb.Endpoint.subscribe("user:#{object_id}")
         Presence.track_presence(
           self(),
           "room:#{room_id}",
           object_id,
-          %{ id: object_id, name: payload["name"]}
+          %{ id: object_id, name: payload["name"], messages: []}
         )
 
         {
@@ -47,6 +48,32 @@ defmodule NeosSocketWeb.RoomChannel do
     )
 
     {:reply, :ok, socket}
+  end
+
+  @impl
+  def handle_in("send_broadcast_user", payload, socket) do
+    {:reply, payload, socket}
+  end
+
+  @impl true
+  def handle_info(%{event: "broadcast_room", payload: state}, socket = %{ assigns: messages}) do
+    message = Rooms.create_message(state).changes
+    push(socket,"send_broadcast_user", message)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_info(%{event: "broadcast_user", payload: state}, socket) do
+    message = Rooms.create_message(state).changes
+    presence = Presence.get_presence("room:#{message.room_id}", message.object_id)
+    Presence.update_presence(
+      self(),
+      "room:#{message.room_id}",
+      message.object_id,
+      %{messages: [message | presence.messages] |> List.flatten }
+    )
+    push(socket,"send_broadcast_user", message)
+    {:noreply, socket}
   end
 
   @impl
